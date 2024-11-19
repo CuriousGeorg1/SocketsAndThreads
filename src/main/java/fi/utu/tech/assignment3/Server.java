@@ -48,15 +48,7 @@ public class Server {
      * Thread --> only one client handled
      * @param serverSocket
      */
-    public static void stopServer(ServerSocket serverSocket) {
-        serverRun = false;
-        try {
-            // Close the ServerSocket to activate accept() call
-            serverSocket.close();
-        } catch (IOException e) {
-            System.err.println("Error closing server socket: " + e.getMessage());
-        }
-    }
+
 
 
 }

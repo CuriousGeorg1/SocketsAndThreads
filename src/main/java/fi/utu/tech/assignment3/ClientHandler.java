@@ -26,7 +26,7 @@ public class ClientHandler extends Thread {
         try (InputStream is = socket.getInputStream()) {
             byte[] received = is.readAllBytes();
             String receivedMessage = new String(received, "UTF-8");
-            System.out.println("Ground Control received: " + receivedMessage);
+            System.out.print("Ground Control received: " + receivedMessage);
         } catch (IOException e) {
             System.err.println("Communication error: " + e.getMessage());
         } finally { // Closing socket
