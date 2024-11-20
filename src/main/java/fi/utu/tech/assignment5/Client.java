@@ -19,28 +19,41 @@ public class Client {
 
     private static void runClient(int clientId) {
 
+        String light = "LIGHT";
+
         //Create messages
-        String firstMessage = "Hello";
-        String secondMessage = "quit";
+        String[] messages = {"ON", "OFF", "QUERY"};
+        String[] lampIds = {"1","2","3","4","5"};
 
         try (Socket s = new Socket("127.0.0.1", 1234)){
             System.out.println("Client" + clientId + " connected");
 
-            try(OutputStream os = s.getOutputStream(); InputStream is = s.getInputStream()) {
-                //Sending message
-                PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)), true);
-                out.println(firstMessage);
-                System.out.println("Client " + clientId + " sent message: Hello");
+            /*
+            For-loop -> tarkoitus lähettää useampi viesti, ei toimi. Kuitenkin
+            useampi client voi lähettää viestejä onnistuneesti
+             */
+            for (int i = 0; i < 1; i++) {
+                // Random message and lamp
+                int messageIndex = (int) (Math.random() * messages.length);
+                int lampIndex = (int) (Math.random() * lampIds.length);
+                System.out.println("Sending message: " + messages[messageIndex] + " to lamp " + lampIds[lampIndex]);
+                try(OutputStream os = s.getOutputStream(); InputStream is = s.getInputStream();) {
+                    //Sending message
+                    PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os)), true);
+                    BufferedReader in = new BufferedReader(new InputStreamReader(is));
+                    if (messages[messageIndex].equals("QUERY")) {
+                        out.println(light + ";" + messages[messageIndex]);
+
+                        String response = in.readLine();
+                        System.out.println(response);
+                    } else {
+                        out.println(light + ";" + messages[messageIndex] + ";" + lampIds[lampIndex]);
+                        String response = in.readLine();
+                        System.out.println(response);
+                    }
+            }
 
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(is));
-                String response = in.readLine();
-
-                if (response.equals("Ack")) {
-                    System.out.println("Varmistus saatu! " + clientId);
-                    out.println(secondMessage);
-                    System.out.println("Client " + clientId + " sent message: quit");
-                }
             }
         } catch (UnknownHostException e) {
             System.out.println(e.getMessage());

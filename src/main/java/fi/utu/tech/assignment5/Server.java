@@ -7,6 +7,7 @@ import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class Server {
 
@@ -14,28 +15,19 @@ public class Server {
 
     public static void main(String[] args) {
         // Thread pool to handle client connections
-        ExecutorService threadPool = Executors.newFixedThreadPool(10);
+        ExecutorService threadPool = Executors.newCachedThreadPool();
 
         try (ServerSocket serverSocket = new ServerSocket(1234)) {
             System.out.println("Kuunnellaan 1234");
-            serverSocket.setSoTimeout(10000); // Server timeout 10s
-
-            long lastClient = System.currentTimeMillis(); // Track last client connection
-
+            serverSocket.setSoTimeout(60000); // 10 seconds timeout
             while (serverRun) {
                 try {
                     // Accept new clients
                     Socket commSocket = serverSocket.accept();
-                    lastClient = System.currentTimeMillis();
 
                     // Start a new thread to handle the client
                     threadPool.execute(new ClientHandler(commSocket, serverSocket));
-                } catch (SocketTimeoutException e) {
-                    long currentTime = System.currentTimeMillis();
-                    if (currentTime - lastClient > 10_000) { // 10 seconds of inactivity
-                        System.out.println("Shutdown");
-                        stopServer(serverSocket, threadPool);
-                    }
+
                 } catch (IOException e) {
                     System.err.println("Error in connection: " + e.getMessage());
                     break;
@@ -52,7 +44,9 @@ public class Server {
     public static void stopServer(ServerSocket serverSocket, ExecutorService threadPool) {
         serverRun = false;
         try {
-            serverSocket.close(); // Close the ServerSocket
+            if (!serverSocket.isClosed()) {
+                serverSocket.close();  // Close the ServerSocket
+            }
         } catch (IOException e) {
             System.err.println("Error closing server socket: " + e.getMessage());
         }
