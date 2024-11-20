@@ -37,7 +37,7 @@ public class Server {
                         stopServer(serverSocket, threadPool);
                     }
                 } catch (IOException e) {
-                    System.err.println("Error accepting connection: " + e.getMessage());
+                    System.err.println("Error in connection: " + e.getMessage());
                     break;
                 }
             }
