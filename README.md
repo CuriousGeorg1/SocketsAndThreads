@@ -2,6 +2,8 @@
 
 This project is for a course in distributed systems done with java.
 
+**Code can be foun in src/main/java/fi/utu/tech**
+
 ## Learning objective
 
 The obective in these assignments was to learn to connect server and client components, different data streams and getting to understand TCP.
